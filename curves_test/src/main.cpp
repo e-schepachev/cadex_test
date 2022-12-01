@@ -21,7 +21,7 @@ constexpr int ELLIPSE_MAX_RADIUS_Y = 200;
 constexpr int HELIX_MAX_RADIUS = 200;
 constexpr int HELIX_MAX_STEP = 200;
 
-std::unique_ptr<Curve> GenerateCircle()
+std::shared_ptr<Curve> GenerateCircle()
 {
     const double radius = rand() % CIRCLE_MAX_RADIUS;
 
@@ -29,7 +29,7 @@ std::unique_ptr<Curve> GenerateCircle()
     return std::make_unique<Circle>(radius);
 }
 
-std::unique_ptr<Curve> GenerateEllipse()
+std::shared_ptr<Curve> GenerateEllipse()
 {
     const double radiusX = rand() % ELLIPSE_MAX_RADIUS_X;
     const double radiusY = rand() % ELLIPSE_MAX_RADIUS_Y;
@@ -38,7 +38,7 @@ std::unique_ptr<Curve> GenerateEllipse()
     return std::make_unique<Ellipse>(radiusX, radiusY);
 }
 
-std::unique_ptr<Curve> GenerateHelix()
+std::shared_ptr<Curve> GenerateHelix()
 {
     const double radius = rand() % HELIX_MAX_RADIUS;
     const double step = rand() % HELIX_MAX_STEP;
@@ -47,7 +47,7 @@ std::unique_ptr<Curve> GenerateHelix()
     return std::make_unique<Helix>(radius, step);
 }
 
-std::vector<std::unique_ptr<Curve>> GenerateCurves(size_t size)
+std::vector<std::shared_ptr<Curve>> GenerateCurves(size_t size)
 {
     std::cout << "Generate " << size << " curves"<< std::endl;
     auto now = std::chrono::system_clock::now();
@@ -55,7 +55,7 @@ std::vector<std::unique_ptr<Curve>> GenerateCurves(size_t size)
 
     srand(time);
 
-    std::vector<std::unique_ptr<Curve>> curves;
+    std::vector<std::shared_ptr<Curve>> curves;
     curves.reserve(size);
     for (size_t i = 0 ; i < size; ++i)
     {
@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<Curve>> GenerateCurves(size_t size)
     return curves;
 }
 
-void PrintCurvesPoints(const std::vector<std::unique_ptr<Curve>>& curves, double angle)
+void PrintCurvesPoints(const std::vector<std::shared_ptr<Curve>>& curves, double angle)
 {
     std::cout << std::endl << "Curve points at '" << angle << "':" << std::endl;
     for (size_t i = 0 ; i < curves.size(); ++i)
@@ -85,7 +85,7 @@ void PrintCurvesPoints(const std::vector<std::unique_ptr<Curve>>& curves, double
 
 }
 
-void PrintCurvesDerivativesValue(const std::vector<std::unique_ptr<Curve>>& curves, double angle)
+void PrintCurvesDerivativesValue(const std::vector<std::shared_ptr<Curve>>& curves, double angle)
 {
     std::cout << std::endl << "Curve derivatives at '" << angle << "':" << std::endl;
     for (size_t i = 0 ; i < curves.size(); ++i)
@@ -95,21 +95,21 @@ void PrintCurvesDerivativesValue(const std::vector<std::unique_ptr<Curve>>& curv
     }
 }
 
-std::vector<Circle*> ShareCircles(const std::vector<std::unique_ptr<Curve>>& curves)
+std::vector<std::shared_ptr<Circle>> ShareCircles(const std::vector<std::shared_ptr<Curve>>& curves)
 {
-    std::vector<Circle*> circles;
+    std::vector<std::shared_ptr<Circle>> circles;
     circles.reserve(curves.size());
 
     for (const auto& curve : curves)
     {
         if (typeid(*curve.get()) == typeid(Circle))
-            circles.emplace_back(dynamic_cast<Circle*>(curve.get()));
+            circles.emplace_back(std::static_pointer_cast<Circle>(curve));
     }
 
     return circles;
 }
 
-void PrintCirclesRadius(const std::vector<Circle*>& circles)
+void PrintCirclesRadius(const std::vector<std::shared_ptr<Circle>>& circles)
 {
     std::cout << std::endl << "Circles raiduses:" << std::endl;
     for (const auto& circle : circles)
@@ -122,11 +122,11 @@ void PrintCirclesRadius(const std::vector<Circle*>& circles)
 
 int main()
 {
-    const std::vector<std::unique_ptr<Curve>> curves = GenerateCurves(TEST_COUNT);
+    const std::vector<std::shared_ptr<Curve>> curves = GenerateCurves(TEST_COUNT);
     PrintCurvesPoints(curves, TEST_ANGLE);
     PrintCurvesDerivativesValue(curves, TEST_ANGLE);
 
-    std::vector<Circle*> circles = ShareCircles(curves);
+    std::vector<std::shared_ptr<Circle>> circles = ShareCircles(curves);
     std::sort(circles.begin(), circles.end(), [](const auto& left, const auto& right){ return left->GetRadius() < right->GetRadius();});
 
     PrintCirclesRadius(circles);
