@@ -26,7 +26,7 @@ std::shared_ptr<Curve> GenerateCircle()
     const double radius = rand() % CIRCLE_MAX_RADIUS;
 
     std::cout << "Circle. Radius: " << radius << std::endl;
-    return std::make_unique<Circle>(radius);
+    return std::make_shared<Circle>(radius);
 }
 
 std::shared_ptr<Curve> GenerateEllipse()
@@ -35,7 +35,7 @@ std::shared_ptr<Curve> GenerateEllipse()
     const double radiusY = rand() % ELLIPSE_MAX_RADIUS_Y;
 
     std::cout << "Ellipse. RadiusX: " << radiusX << " RadiusY: " << radiusY << std::endl;
-    return std::make_unique<Ellipse>(radiusX, radiusY);
+    return std::make_shared<Ellipse>(radiusX, radiusY);
 }
 
 std::shared_ptr<Curve> GenerateHelix()
@@ -44,7 +44,7 @@ std::shared_ptr<Curve> GenerateHelix()
     const double step = rand() % HELIX_MAX_STEP;
 
     std::cout << "Helix. Radius " << radius << " Step "<< step << std::endl;
-    return std::make_unique<Helix>(radius, step);
+    return std::make_shared<Helix>(radius, step);
 }
 
 std::vector<std::shared_ptr<Curve>> GenerateCurves(size_t size)
